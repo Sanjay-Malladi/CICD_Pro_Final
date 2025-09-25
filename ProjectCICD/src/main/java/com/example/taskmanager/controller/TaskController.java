@@ -2,7 +2,6 @@ package com.example.taskmanager.controller;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.service.TaskService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -15,29 +14,25 @@ public class TaskController {
 
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
-    }
+    }       
 
     @GetMapping
-    public ResponseEntity<List<Task>> getTasks() {
-        List<Task> tasks = taskService.getAllTasks();
-        return ResponseEntity.ok(tasks);
+    public List<Task> getTasks() {
+        return taskService.getAllTasks();
     }
 
     @PostMapping
-    public ResponseEntity<Task> addTask(@RequestBody Task task) {
-        Task saved = taskService.addTask(task);
-        return ResponseEntity.ok(saved);
+    public Task addTask(@RequestBody Task task) {
+        return taskService.addTask(task);
     }
 
     @PutMapping("/{id}/toggle")
-    public ResponseEntity<Task> toggleTask(@PathVariable Long id) {
-        Task updated = taskService.toggleTask(id);
-        return ResponseEntity.ok(updated);
+    public Task toggleTask(@PathVariable Long id) {
+        return taskService.toggleTask(id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+    public void deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
-        return ResponseEntity.noContent().build();
     }
 }

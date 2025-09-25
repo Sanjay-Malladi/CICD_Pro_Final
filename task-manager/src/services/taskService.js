@@ -1,27 +1,27 @@
-import axios from "axios";
+const API_URL = "http://localhost:9092/api/tasks";
 
-const API_URL = "http://localhost:8081/api/tasks";
-
-// Get all tasks
 export const getTasks = async () => {
-  const response = await axios.get(API_URL);
-  return response.data;
+  const res = await fetch(API_URL);
+  return await res.json();
 };
 
-// Add a new task
 export const addTask = async (task) => {
-  const response = await axios.post(API_URL, task);
-  return response.data;
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(task),
+  });
+  return await res.json();
 };
 
-// Toggle task completion (mark as done/undone)
 export const toggleTaskCompletion = async (id) => {
-  const response = await axios.put(`${API_URL}/${id}/toggle`);
-  return response.data;
+  const res = await fetch(`${API_URL}/${id}/toggle`, { method: "PUT" });
+  if (!res.ok) throw new Error("Toggle failed");
+  return await res.json();
 };
 
-// ✅ Delete a task
 export const deleteTask = async (id) => {
-  const response = await axios.delete(`${API_URL}/${id}`);
-  return response.data;
+  const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Delete failed");
+  return true;
 };

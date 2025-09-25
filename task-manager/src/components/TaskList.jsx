@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { getTasks, addTask, toggleTaskCompletion, deleteTask } from "../services/taskService"; 
-// ✅ added deleteTask here
+import { getTasks, addTask, toggleTaskCompletion, deleteTask } from "../services/taskService";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
   const [priority, setPriority] = useState("low");
-  const [category, setCategory] = useState("Work"); // default option
+  const [category, setCategory] = useState("Work");
 
   useEffect(() => {
     fetchTasks();
@@ -19,25 +18,40 @@ const TaskList = () => {
 
   const handleAddTask = async () => {
     if (!newTask.trim()) return;
-    await addTask({
-      description: newTask,
-      priority,
-      category,
-      completed: false,   // ✅ send completed field
-    });
-    setNewTask("");
-    fetchTasks();
+    try {
+      const addedTask = await addTask({
+        description: newTask,
+        priority,
+        category,
+        completed: false,
+      });
+      setTasks((prev) => [...prev, addedTask]);
+      setNewTask("");
+    } catch (err) {
+      console.error("Add task failed:", err);
+      alert("Failed to add task");
+    }
   };
 
   const handleToggle = async (id) => {
-    await toggleTaskCompletion(id);
-    fetchTasks();
+    try {
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id ? { ...task, completed: !task.completed } : task
+        )
+      );
+      await toggleTaskCompletion(id);
+    } catch (err) {
+      console.error("Toggle failed:", err);
+      alert("Failed to toggle task");
+      fetchTasks(); // fallback
+    }
   };
 
   const handleDelete = async (id) => {
     try {
       await deleteTask(id);
-      fetchTasks(); // refresh list after delete
+      setTasks((prev) => prev.filter((task) => task.id !== id));
     } catch (err) {
       console.error("Delete failed:", err);
       alert("Failed to delete task");
@@ -48,7 +62,6 @@ const TaskList = () => {
     <div className="task-container">
       <h2>My Tasks</h2>
 
-      {/* Add Task */}
       <div className="task-input">
         <input
           type="text"
@@ -69,7 +82,6 @@ const TaskList = () => {
         <button onClick={handleAddTask}>Add Task</button>
       </div>
 
-      {/* Task List */}
       <ul>
         {tasks.map((task) => (
           <li key={task.id} className={task.completed ? "completed" : ""}>

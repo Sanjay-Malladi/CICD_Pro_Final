@@ -22,13 +22,13 @@ public class TaskService {
         return taskRepo.save(task);
     }
 
-    public void deleteTask(Long id) {
-        taskRepo.deleteById(id);
-    }
-
     public Task toggleTask(Long id) {
-        Task task = taskRepo.findById(id).orElseThrow();
+        Task task = taskRepo.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
         task.setCompleted(!task.isCompleted());
         return taskRepo.save(task);
+    }
+
+    public void deleteTask(Long id) {
+        taskRepo.deleteById(id);
     }
 }
